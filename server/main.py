@@ -14,7 +14,12 @@ from server.models.service_request import ServiceRequest
 import uvicorn
 import argparse
 
-mcp = FastMCP(name="IT-HelpDesk", enable_sessions=True, stateless_http=False)
+mcp = FastMCP(
+    name="IT-HelpDesk", 
+    enable_sessions=True, 
+    stateless_http=False,
+    enable_streamable_http=True,
+)
 
 @mcp.tool()
 def read_services() -> ListServicesResponse:
@@ -29,15 +34,16 @@ def read_services() -> ListServicesResponse:
         try:
             services = get_services(session)
             return {
-                "status": "success",
-                "message": "Services retrieved successfully",
-                "data": services
-            }
+                    "status": "success",
+                    "message": "Services retrieved successfully.",
+                    "data": services
+                }
         except Exception as e:
             return {
-                "status": "error",
-                "message": str(e),
-                "data": []
+                "error": {
+                    "code": -1,
+                    "message": str(e)
+                }
             }
 
 @mcp.tool()
@@ -66,12 +72,17 @@ def modify_service_quantity(
             if not updated_service:
                 return {"status": "error", "message": "Service not found"}
             return {
-                "status": "success",
-                "message": "Service quantity updated successfully",
-                "data": updated_service
-            }
+                    "status": "success",
+                    "message": "Service quantity updated successfully.",
+                    "data": updated_service
+                }
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {
+                "error": {
+                    "code": -1,
+                    "message": str(e)
+                }
+            }
 
 @mcp.tool()
 def read_service_requests() -> ListServiceRequestsResponse:
@@ -89,15 +100,16 @@ def read_service_requests() -> ListServiceRequestsResponse:
         try:
             service_requests = get_service_requests(session)
             return {
-                "status": "success",
-                "message": "Service requests retrieved successfully.",
-                "data": service_requests
-            }
+                    "status": "success",
+                    "message": "Service requests retrieved successfully.",
+                    "data": service_requests
+                }
         except Exception as e:
             return {
-                "status": "error",
-                "message": str(e),
-                "data": []
+                "error": {
+                    "code": -1,
+                    "message": str(e)
+                }
             }
 
 @mcp.tool()
@@ -126,15 +138,16 @@ def create_new_service_request(
             new_request = ServiceRequest(**request.model_dump())
             created = create_service_request(session, new_request)
             return {
-                "status": "success",
-                "message": "Service request created successfully.",
-                "data": created
-            }
+                    "status": "success",
+                    "message": "Service request created successfully.",
+                    "data": created
+                }
         except Exception as e:
             return {
-                "status": "error",
-                "message": str(e),
-                "data": None
+                "error": {
+                    "code": -1,
+                    "message": str(e)
+                }
             }
 
 @mcp.tool()
@@ -162,21 +175,23 @@ def modify_service_request_status(
             updated = update_service_request_status(session, request_id, payload.status)
             if updated:
                 return {
-                    "status": "success",
-                    "message": "Service request status updated successfully.",
-                    "data": updated
-                }
+                        "status": "success",
+                        "message": "Service request status updated successfully.",
+                        "data": updated
+                    }
             else:
                 return {
-                    "status": "error",
-                    "message": f"ServiceRequest with id {request_id} not found.",
-                    "data": None
+                    "error": {
+                        "code": -1,
+                        "message": "Service request not found"
+                    }
                 }
         except Exception as e:
             return {
-                "status": "error",
-                "message": str(e),
-                "data": None
+               "error": {
+                    "code": -1,
+                    "message": str(e)
+                }
             }
 
 if __name__ == "__main__":
