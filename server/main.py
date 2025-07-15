@@ -8,7 +8,12 @@ from server.tools.service import (
     read_services, modify_service_quantity
 )
 from server.tools.service_request import (
-    read_service_requests, create_service_request, update_service_request_status
+    read_service_requests, create_new_service_request, modify_service_request_status
+)
+from server.schemas.service import UpdateServiceQuantityResponse, ListServicesResponse
+from server.schemas.service_request import (
+    ListServiceRequestsResponse, CreateServiceRequestResponse, 
+    UpdateServiceRequestStatusResponse
 )
 
 mcp = FastMCP(
@@ -36,6 +41,7 @@ Returns:
         - message: A descriptive message about the operation
         - data: A list of service objects if successful, or an error object if there was an error
 """,
+    structured_output=ListServicesResponse, 
 )
 
 mcp.add_tool(
@@ -56,6 +62,7 @@ Returns:
         - message: A descriptive message about the operation
         - data: The updated service object if successful, or None if the service was not found
 """,
+    structured_output=UpdateServiceQuantityResponse,
 )
 
 mcp.add_tool(
@@ -69,11 +76,12 @@ Returns:
         - status: "success" or "error"
         - message: A descriptive message about the operation
         - data: A list of service request objects, or an empty list if no requests are found
-"""
+""",
+    structured_output=ListServiceRequestsResponse,
 )
 
 mcp.add_tool(
-    fn=create_service_request,
+    fn=create_new_service_request,
     name="create_service_request",
     description="""Create a new service request in the database.
 This function creates a new service request and returns the created request data.
@@ -88,10 +96,11 @@ Returns:
         - message: A descriptive message about the operation
         - data: The created service request object if successful, or None if the creation failed
 """,
+    structured_output=CreateServiceRequestResponse,
 )
 
 mcp.add_tool(
-    fn=update_service_request_status,
+    fn=modify_service_request_status,
     name="update_service_request_status",
     description="""Update the status of a service request in the database.
 This function modifies the status of a specified service request and returns the updated request data.
@@ -105,6 +114,7 @@ Returns:
         - message: A descriptive message about the operation
         - data: The updated service request object if successful, or None if the request was not found
 """,
+    structured_output=UpdateServiceRequestStatusResponse,
 )
 
 if __name__ == "__main__":
