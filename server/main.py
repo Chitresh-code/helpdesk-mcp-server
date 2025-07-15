@@ -11,6 +11,7 @@ from server.schemas.service_request import (
 )
 from server.crud.service_request import get_service_requests, create_service_request, update_service_request_status
 from server.models.service_request import ServiceRequest
+from fastapi.responses import JSONResponse
 import uvicorn
 import argparse
 
@@ -20,6 +21,14 @@ mcp = FastMCP(
     stateless_http=False,
     enable_streamable_http=True,
 )
+
+# Expose FastAPI app
+app = mcp.streamable_http_app
+
+# Add OpenAPI route
+@app.get("/openapi.json")
+def openapi_schema():
+    return JSONResponse(mcp.openapi_schema())
 
 @mcp.tool()
 def read_services() -> ListServicesResponse:
