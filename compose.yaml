@@ -1,0 +1,16 @@
+services:
+  mcp-server:
+    build:
+      context: .
+    container_name: mcp-server
+    restart: unless-stopped
+    init: true
+    env_file: .env  # Optional if using environment variables
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
