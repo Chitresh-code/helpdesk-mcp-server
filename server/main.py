@@ -3,7 +3,7 @@ from server.db.init_db import init_db
 from fastapi.responses import JSONResponse
 import uvicorn
 import argparse
-
+from fastapi import Request
 from server.tools.service import (
     read_services, modify_service_quantity
 )
@@ -22,11 +22,6 @@ mcp = FastMCP(
     stateless_http=False,
     enable_streamable_http=True,
 )
-
-# Add OpenAPI route
-@mcp.custom_route(path="/openapi.json", methods=["GET"], name="openapi_schema")
-def openapi_schema():
-    return JSONResponse(mcp.openapi_schema())
 
 mcp.add_tool(
     fn=read_services,
